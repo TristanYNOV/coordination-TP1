@@ -27,7 +27,10 @@ export default function ProductManager() {
   useEffect(() => {
     fetch(productUri, { headers: { ...buildAuthHeaders() } })
       .then((res) => res.json())
-      .then((data) => setProducts(data.data));
+      .then((data) =>
+        setProducts(Array.isArray(data?.data) ? data.data : []),
+      )
+      .catch(() => setProducts([]));
   }, []);
 
   // Add a new product
@@ -125,7 +128,8 @@ export default function ProductManager() {
           <li key={product.id} className="mb-2 flex items-center">
             <div className="flex-1">
               <span className="font-bold">{product.name}</span> - {product.comment} (
-              {product.quantity}) from {product.company.name} ({product.company_id})
+              {product.quantity}) from {product.company?.name ?? 'N/A'} (
+              {product.company_id})
             </div>
             <button
               onClick={() => setEditingProduct(product)}
