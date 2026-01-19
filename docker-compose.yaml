@@ -79,6 +79,19 @@ services:
     networks:
       - course_tp_coord_front_back
 
+  graphql-engine:
+    image: hasura/graphql-engine:latest
+    ports:
+    - "8080:8080"
+    depends_on:
+    - "db_tp_coord_front_back"
+    restart: unless-stopped
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=${DB_URL}
+      - HASURA_GRAPHQL_ENABLE_CONSOLE=true
+    networks:
+      - course_tp_coord_front_back
+
 networks:
   course_tp_coord_front_back:
     name: course_tp_coord_front_back

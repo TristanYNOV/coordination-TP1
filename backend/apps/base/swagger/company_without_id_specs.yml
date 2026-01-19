@@ -1,0 +1,22 @@
+Get all Company endpoint
+---
+tags:
+  - Company
+definitions:
+  Product:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+  Company:
+    type: array
+responses:
+  200:
+    description: A list of Company
+    schema:
+      $ref: '#/definitions/Company'
+    examples:
+      - [{"id": "1234", "name": "My Graou company"}, {"id": "5678", "name": "My miaou company"}]
+      - []
