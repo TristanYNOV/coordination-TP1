@@ -6,8 +6,12 @@ import { Product } from '../../generated/graphql';
 const hasuraUrl =
   process.env.NEXT_PUBLIC_HASURA_GRAPHQL_URL ?? 'http://localhost:8080/v1/graphql';
 
-const PRODUCTS_QUERY = `
-  query ProductList {
+const hasuraWsUrl = hasuraUrl.startsWith('http')
+  ? hasuraUrl.replace(/^http/, 'ws')
+  : hasuraUrl;
+
+const PRODUCTS_SUBSCRIPTION = `
+  subscription ProductList {
     product(order_by: { id: asc }) {
       id
       name
@@ -33,34 +37,75 @@ export default function ProductGraphqlList() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(hasuraUrl, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'X-Hasura-Role': 'user',
-            'X-Hasura-User-Id': '1',
-          },
-          body: JSON.stringify({ query: PRODUCTS_QUERY }),
-        });
+    let isActive = true;
+    const ws = new WebSocket(hasuraWsUrl, 'graphql-ws');
 
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP ${response.status}`);
-        }
+    const headers = {
+      'X-Hasura-Role': 'user',
+      'X-Hasura-User-Id': '1',
+    };
 
-        const result = (await response.json()) as ProductsQueryResponse;
-        setProducts(result.data.product);
-      } catch (fetchError) {
-        const message =
-          fetchError instanceof Error ? fetchError.message : 'Erreur inconnue';
-        setError(message);
-      } finally {
-        setLoading(false);
+    const handleError = (message: string) => {
+      if (!isActive) return;
+      setError(message);
+      setLoading(false);
+    };
+
+    ws.onopen = () => {
+      ws.send(
+        JSON.stringify({
+          type: 'connection_init',
+          payload: { headers },
+        }),
+      );
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data) as
+        | { type: 'connection_ack' }
+        | { type: 'connection_error'; payload?: { message?: string } }
+        | { type: 'data'; payload: ProductsQueryResponse }
+        | { type: 'error'; payload?: { message?: string } }
+        | { type: 'complete' };
+
+      switch (message.type) {
+        case 'connection_ack':
+          ws.send(
+            JSON.stringify({
+              id: 'product-list',
+              type: 'start',
+              payload: {
+                query: PRODUCTS_SUBSCRIPTION,
+              },
+            }),
+          );
+          return;
+        case 'data':
+          if (!isActive) return;
+          setProducts(message.payload.data.product);
+          setLoading(false);
+          return;
+        case 'connection_error':
+        case 'error':
+          handleError(message.payload?.message ?? 'Erreur de souscription Hasura.');
+          return;
+        case 'complete':
+          if (!isActive) return;
+          setLoading(false);
+          return;
+        default:
+          return;
       }
     };
 
-    fetchProducts();
+    ws.onerror = () => {
+      handleError('Impossible de se connecter à Hasura.');
+    };
+
+    return () => {
+      isActive = false;
+      ws.close(1000, 'component-unmount');
+    };
   }, []);
 
   return (
