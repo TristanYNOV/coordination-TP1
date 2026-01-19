@@ -4,6 +4,7 @@ from flask_login import (
     current_user,
 )
 from flasgger.utils import swag_from
+from flask_jwt_extended import jwt_required
 
 from apps import db
 
@@ -19,6 +20,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 @blueprint.route('/')
+@jwt_required()
 def route_default():
     login_form = LoginForm(request.form)
     if not current_user.is_authenticated:
@@ -44,6 +46,7 @@ def has_permission(model, method):
 @swag_from('swagger/company_with_id_specs.yml', endpoint='base_blueprint.company-with-id', methods=['GET'])
 @blueprint.route('/company/', endpoint='company-create', methods=['POST'])
 @swag_from('swagger/company_create_specs.yml', endpoint='base_blueprint.company-create', methods=['POST'])
+@jwt_required()
 def company(cmp_id=None):
     if not has_permission('Company', request.method):
         return "You need to be authenticated", 401
@@ -78,6 +81,7 @@ def company(cmp_id=None):
 @swag_from('swagger/product_create_specs.yml', endpoint='base_blueprint.product-update', methods=['PUT', 'PATCH'])
 @blueprint.route('/product/<int:product_id>', endpoint='product-delete', methods=['DELETE'])
 @swag_from('swagger/product_with_id_specs.yml', endpoint='base_blueprint.product-delete', methods=['DELETE'])
+@jwt_required()
 def product(product_id=None):
     if not has_permission('Product', request.method):
         return "You need to be authenticated", 401

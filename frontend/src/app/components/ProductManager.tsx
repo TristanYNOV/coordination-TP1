@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
+import { buildAuthHeaders } from '../utils/auth';
 const backendUri = process.env.NEXT_PUBLIC_BACKEND_URL;
 const productUri = `${backendUri}/api/product`
 
@@ -24,7 +25,7 @@ export default function ProductManager() {
 
   // Fetch products on initial load
   useEffect(() => {
-    fetch(productUri)
+    fetch(productUri, { headers: { ...buildAuthHeaders() } })
       .then((res) => res.json())
       .then((data) => setProducts(data.data));
   }, []);
@@ -38,7 +39,7 @@ export default function ProductManager() {
 
     const res = await fetch(productUri, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...buildAuthHeaders() },
       body: JSON.stringify(newProduct),
     });
     const product = await res.json();
@@ -52,7 +53,7 @@ export default function ProductManager() {
 
     const res = await fetch(`${productUri}/${editingProduct.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...buildAuthHeaders() },
       body: JSON.stringify(editingProduct),
     });
     await res.json();
@@ -64,7 +65,10 @@ export default function ProductManager() {
 
   // Delete a product
   const deleteProduct = async (id: number) => {
-    await fetch(`${productUri}/${id}`, { method: 'DELETE' });
+    await fetch(`${productUri}/${id}`, {
+      method: 'DELETE',
+      headers: { ...buildAuthHeaders() },
+    });
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
