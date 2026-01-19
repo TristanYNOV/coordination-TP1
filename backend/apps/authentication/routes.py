@@ -4,12 +4,13 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from apps.base.models.company import Company
-from flask import render_template, redirect, request, url_for, current_app
+from flask import render_template, redirect, request, url_for, current_app, jsonify
 from flask_login import (
     current_user,
     login_user,
     logout_user
 )
+from flask_jwt_extended import create_access_token
 
 from apps import db, login_manager
 from apps.authentication import blueprint
@@ -53,6 +54,25 @@ def login():
         return render_template('accounts/login.html',
                                msg='Mauvais pseudo ou mot de passe',
                                form=login_form)
+
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        username = payload.get('username')
+        password = payload.get('password')
+
+        if not username or not password:
+            return jsonify({'message': 'Nom d’utilisateur et mot de passe requis'}), 400
+
+        user = Users.query.filter_by(username=username).first()
+        if user and verify_pass(password, user.password):
+            access_token = create_access_token(identity=str(user.id))
+            return jsonify(
+                access_token=access_token,
+                token_type='bearer',
+                user={'id': user.id, 'username': user.username, 'email': user.email},
+            )
+
+        return jsonify({'message': 'Mauvais pseudo ou mot de passe'}), 401
 
     logout_user()
     return render_template('accounts/login.html',
