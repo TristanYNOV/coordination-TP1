@@ -1,8 +1,33 @@
+'use client';
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ProductManager from "./components/ProductManager";
 import ProductGraphqlList from "./components/ProductGraphqlList";
+import { getStoredAuthToken } from "./utils/auth";
 
 export default function Home() {
+  const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const token = getStoredAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    setIsReady(true);
+  }, [router]);
+
+  if (!isReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-gray-600">
+        Vérification de votre session...
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">

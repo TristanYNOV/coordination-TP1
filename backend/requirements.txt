@@ -35,6 +35,8 @@ flask-bcrypt==1.0.1
     # via -r requirements.in
 flask-cors==4.0.0
     # via -r requirements.in
+flask-jwt-extended==4.6.0
+    # via -r requirements.in
 flask-login==0.6.3
     # via -r requirements.in
 flask-migrate==4.0.4
@@ -83,6 +85,8 @@ packaging==24.2
     #   gunicorn
 psycopg2==2.9.10
     # via -r requirements.in
+pyjwt==2.9.0
+    # via flask-jwt-extended
 pytz==2024.2
     # via flask-restx
 pyyaml==6.0.2

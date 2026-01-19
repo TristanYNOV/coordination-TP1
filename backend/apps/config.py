@@ -8,7 +8,8 @@ locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
 class Config(object):
     basedir = os.path.abspath(os.path.dirname(__file__))
 
-    SECRET_KEY = os.getenv('SECRET_KEY', None)
+    SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', SECRET_KEY)
 
     # CDN Support Settings 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
