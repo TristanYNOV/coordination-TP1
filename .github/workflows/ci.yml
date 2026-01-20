@@ -74,8 +74,8 @@ jobs:
           file: ./backend/Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ghcr.io/${{ github.repository }}-backend:latest
-            ghcr.io/${{ github.repository }}-backend:${{ github.sha }}
+            ghcr.io/graou/backend:latest
+            ghcr.io/graou/backend:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -84,5 +84,5 @@ jobs:
           file: ./frontend/Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ghcr.io/${{ github.repository }}-frontend:latest
-            ghcr.io/${{ github.repository }}-frontend:${{ github.sha }}
+            ghcr.io/graou/frontend:latest
+            ghcr.io/graou/frontend:${{ github.sha }}
