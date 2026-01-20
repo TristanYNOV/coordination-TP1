@@ -36,7 +36,20 @@ describe('ProductManager', () => {
   it('adds a product and updates the list', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce({ json: async () => ({ data: [] }) })
+      .mockResolvedValueOnce({
+        json: async () => ({
+          data: [
+            {
+              id: 1,
+              name: 'Initial',
+              comment: 'Seed',
+              quantity: 1,
+              company_id: '10',
+              company: { name: 'Seed Co' },
+            },
+          ],
+        }),
+      })
       .mockResolvedValueOnce({
         json: async () => ({
           id: 2,
@@ -50,6 +63,8 @@ describe('ProductManager', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     render(<ProductManager />);
+
+    expect(await screen.findByText(/Initial/i)).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText(/Product name/i), {
       target: { value: 'Mouse' },
