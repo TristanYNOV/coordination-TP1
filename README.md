@@ -1,5 +1,6 @@
 # Coordination frontend / backend
 ## Notes
+tristan.gottschalk
 Cette version n'utilise pas la CLI de hasura il est donc nécessaire d'importer/export sois même sur l'UI les configurations.
 
 ## TODO: 
