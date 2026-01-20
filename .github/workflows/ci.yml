@@ -60,6 +60,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Compute lowercase owner
+        id: owner
+        run: echo "lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -78,8 +82,8 @@ jobs:
           file: ./backend/Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ghcr.io/${{ env.GHCR_NAMESPACE }}/backend:latest
-            ghcr.io/${{ env.GHCR_NAMESPACE }}/backend:${{ github.sha }}
+            ghcr.io/${{ steps.owner.outputs.lc }}/backend:latest
+            ghcr.io/${{ steps.owner.outputs.lc }}/backend:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -88,5 +92,5 @@ jobs:
           file: ./frontend/Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ghcr.io/${{ env.GHCR_NAMESPACE }}/frontend:latest
-            ghcr.io/${{ env.GHCR_NAMESPACE }}/frontend:${{ github.sha }}
+            ghcr.io/${{ steps.owner.outputs.lc }}/frontend:latest
+            ghcr.io/${{ steps.owner.outputs.lc }}/frontend:${{ github.sha }}
