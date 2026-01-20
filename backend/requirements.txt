@@ -91,6 +91,7 @@ pytz==2024.2
     # via flask-restx
 pyyaml==6.0.2
     # via flasgger
+pytest==8.3.4
 referencing==0.35.1
     # via
     #   jsonschema
