@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      GHCR_NAMESPACE: graou
+      GHCR_NAMESPACE: github.repository_owner
 
     steps:
       - name: Checkout
