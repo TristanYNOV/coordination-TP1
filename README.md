@@ -1,4 +1,10 @@
 # Coordination frontend / backend
+## Notes
+Cette version n'utilise pas la CLI de hasura il est donc nécessaire d'importer/export sois même sur l'UI les configurations.
+
+## TODO: 
+Hors refactor de composants, il serait optimal de ne réaliser le build de l'image que lors de push/merge sur la branche main. Les conditions exactes sont encore à déterminer.
+Pour le moment le build et l'image sont générés à chaque PR/push sur toutes branches
 
 ## Contenu du repository
 Ce repository est constitué d'une application fullstack :
